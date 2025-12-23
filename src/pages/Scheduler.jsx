@@ -14,6 +14,7 @@ const Scheduler = () => {
   const [scheduledPosts, setScheduledPosts] = useState([]);
   const [connectedAccounts, setConnectedAccounts] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [viewMode, setViewMode] = useState('week'); // 'week' or 'month'
@@ -66,6 +67,14 @@ const Scheduler = () => {
     }
   }, [location.state]);
 
+  const handlePreview = () => {
+    if (!formPlatform || !formCaption || !formDate || !formTime) {
+      showToast('Please fill in all required fields before preview', 'error');
+      return;
+    }
+    setShowPreview(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user || !formPlatform || !formCaption || !formDate || !formTime) {
@@ -98,6 +107,7 @@ const Scheduler = () => {
 
       // Reset form
       setShowModal(false);
+      setShowPreview(false);
       setEditingPost(null);
       setFormCaption('');
       setFormMediaUrl('');
@@ -348,6 +358,13 @@ const Scheduler = () => {
               </div>
 
               <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handlePreview}
+                >
+                  Preview
+                </button>
                 <button type="submit" className="btn btn-primary">
                   {editingPost ? 'Update' : 'Schedule'}
                 </button>
@@ -356,6 +373,7 @@ const Scheduler = () => {
                   className="btn btn-secondary"
                   onClick={() => {
                     setShowModal(false);
+                    setShowPreview(false);
                     setEditingPost(null);
                   }}
                 >
@@ -363,6 +381,55 @@ const Scheduler = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showPreview && (
+        <div className="modal-overlay" onClick={() => setShowPreview(false)}>
+          <div className="modal-content post-preview-modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Post Preview</h2>
+            <div className="post-preview">
+              <div className="preview-platform">
+                <span className="post-platform-badge">{formPlatform}</span>
+                <span className="preview-date">
+                  {formDate && formTime
+                    ? format(new Date(`${formDate}T${formTime}`), 'MMM d, yyyy HH:mm')
+                    : 'Date not set'}
+                </span>
+              </div>
+              {formMediaUrl && (
+                <div className="preview-media">
+                  <img src={formMediaUrl} alt="Post preview" onError={(e) => {
+                    e.target.style.display = 'none';
+                  }} />
+                </div>
+              )}
+              <div className="preview-caption">
+                {formCaption.split('\n').map((line, idx) => (
+                  <p key={idx}>{line || '\u00A0'}</p>
+                ))}
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowPreview(false)}
+              >
+                Close Preview
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => {
+                  setShowPreview(false);
+                  document.querySelector('form')?.requestSubmit();
+                }}
+              >
+                {editingPost ? 'Update Post' : 'Schedule Post'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,0 +1,36 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 280px;
+  transition: margin-left var(--transition-base);
+  min-height: 100vh;
+}
+
+.layout-content {
+  flex: 1;
+  padding-bottom: var(--spacing-xl);
+}
+
+/* When sidebar is collapsed */
+.sidebar-collapsed ~ .layout-main {
+  margin-left: 72px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .layout-main {
+    margin-left: 0;
+  }
+
+  .sidebar-collapsed ~ .layout-main {
+    margin-left: 0;
+  }
+}
+

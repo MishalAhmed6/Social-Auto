@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Users collection - users can read/write their own profile
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      
+      // User's social accounts subcollection
+      match /socialAccounts/{accountId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // User's post templates subcollection
+      match /postTemplates/{templateId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // User's scheduled posts subcollection
+      match /scheduledPosts/{postId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // User's post insights subcollection
+      match /postInsights/{insightId} {
+        allow read: if isOwner(userId);
+        // Write is typically done by backend/Cloud Functions
+        allow write: if false;
+      }
+    }
+    
+    // Subscriptions collection - users can read their own subscription
+    match /subscriptions/{userId} {
+      allow read: if isOwner(userId);
+      // Write is typically done by backend/Cloud Functions (Stripe webhooks)
+      allow write: if false;
+    }
+  }
+}
+

@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../components/ProtectedRoute';
 import Layout from '../components/Layout';
+import Landing from '../pages/Landing';
 import Login from '../pages/Login';
 import Signup from '../pages/Signup';
 import ForgotPassword from '../pages/ForgotPassword';
+import OAuthCallback from '../pages/OAuthCallback';
 import Dashboard from '../pages/Dashboard';
 import OnboardingProfile from '../pages/OnboardingProfile';
 import OnboardingPlan from '../pages/OnboardingPlan';
@@ -18,9 +20,11 @@ const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/oauth/callback" element={<OAuthCallback />} />
         
         <Route
           path="/onboarding/profile"
@@ -113,8 +117,6 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
-        
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );

@@ -45,6 +45,11 @@ const Signup = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <Link to="/" style={{ color: 'var(--primary)', fontSize: '14px', textDecoration: 'none' }}>
+            ← Back to Home
+          </Link>
+        </div>
         <h1>Create Account</h1>
         <p className="auth-subtitle">Sign up to get started</p>
 

@@ -62,7 +62,9 @@ const Billing = () => {
           <div className="subscription-card">
             <h2>Current Plan</h2>
             <div className="plan-info">
-              <div className="plan-name">{subscription.planId || 'Unknown Plan'}</div>
+              <div className="plan-name">
+                {subscription.planId ? subscription.planId.charAt(0).toUpperCase() + subscription.planId.slice(1) : 'Unknown Plan'}
+              </div>
               {subscription.status && (
                 <span className={`plan-status plan-status-${subscription.status}`}>
                   {subscription.status}
@@ -74,7 +76,7 @@ const Billing = () => {
               <div className="plan-details">
                 <p>
                   <strong>Renews on:</strong>{' '}
-                  {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                  {new Date(subscription.currentPeriodEnd.seconds ? subscription.currentPeriodEnd.seconds * 1000 : subscription.currentPeriodEnd).toLocaleDateString()}
                 </p>
               </div>
             )}
@@ -83,14 +85,15 @@ const Billing = () => {
               <div className="plan-limits">
                 <h3>Plan Limits</h3>
                 <ul>
-                  {subscription.limits.aiPostsPerMonth && (
-                    <li>AI Posts: {subscription.limits.aiPostsPerMonth} per month</li>
-                  )}
-                  {subscription.limits.connectedAccounts && (
-                    <li>
-                      Connected Accounts: {subscription.limits.connectedAccounts}
-                    </li>
-                  )}
+                  <li>
+                    Social Accounts: {subscription.limits.socialAccounts === -1 ? 'Unlimited' : subscription.limits.socialAccounts}
+                  </li>
+                  <li>
+                    AI Generations: {subscription.limits.aiGenerationsPerMonth === -1 ? 'Unlimited' : `${subscription.limits.aiGenerationsPerMonth} per month`}
+                  </li>
+                  <li>
+                    Scheduled Posts: {subscription.limits.scheduledPostsPerMonth === -1 ? 'Unlimited' : `${subscription.limits.scheduledPostsPerMonth} per month`}
+                  </li>
                 </ul>
               </div>
             )}

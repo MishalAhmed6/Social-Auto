@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FiZap, FiSave, FiCalendar, FiEdit2, FiX, FiCheck } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { aiAPI } from '../api/cloudFunctions';
 import { collection, addDoc } from 'firebase/firestore';
@@ -120,6 +121,9 @@ const AI = () => {
   return (
     <div className="ai-container">
       <div className="ai-header">
+        <div className="ai-header-icon">
+          <FiZap />
+        </div>
         <h1>AI Content Generator</h1>
         <p>Generate engaging social media posts with AI</p>
       </div>
@@ -183,7 +187,7 @@ const AI = () => {
           </div>
 
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Generating...' : 'Generate Posts'}
+            <FiZap /> {loading ? 'Generating...' : 'Generate Posts'}
           </button>
         </form>
       </div>
@@ -222,13 +226,13 @@ const AI = () => {
                         className="btn btn-primary"
                         onClick={handleSaveEdit}
                       >
-                        Save
+                        <FiCheck /> Save
                       </button>
                       <button
                         className="btn btn-secondary"
                         onClick={() => setEditingPost(null)}
                       >
-                        Cancel
+                        <FiX /> Cancel
                       </button>
                     </div>
                   </div>
@@ -250,25 +254,25 @@ const AI = () => {
                         className="btn btn-small"
                         onClick={() => handleEdit(post, index)}
                       >
-                        Edit
+                        <FiEdit2 /> Edit
                       </button>
                       <button
                         className="btn btn-small"
                         onClick={() => handleSaveAsTemplate(post)}
                       >
-                        Save Template
+                        <FiSave /> Save Template
                       </button>
                       <button
                         className="btn btn-small"
                         onClick={() => handleSchedule(post)}
                       >
-                        Schedule
+                        <FiCalendar /> Schedule
                       </button>
                       <button
                         className="btn btn-small btn-danger"
                         onClick={() => handleDelete(index)}
                       >
-                        Delete
+                        <FiX /> Delete
                       </button>
                     </div>
                   </>

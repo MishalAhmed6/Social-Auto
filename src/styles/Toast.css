@@ -1,18 +1,23 @@
 .toast {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 16px 24px;
-  border-radius: 6px;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  z-index: 10000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: slideIn 0.3s ease-out;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius);
+  color: var(--text-inverse);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  z-index: var(--z-tooltip);
+  box-shadow: var(--shadow-xl);
+  animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  max-width: 400px;
+  backdrop-filter: blur(10px);
 }
 
-@keyframes slideIn {
+@keyframes slideInRight {
   from {
     transform: translateX(100%);
     opacity: 0;
@@ -24,18 +29,57 @@
 }
 
 .toast-success {
-  background-color: #2e7d32;
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+  border-left: 4px solid #10b981;
 }
 
 .toast-error {
-  background-color: #c62828;
+  background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+  border-left: 4px solid #ef4444;
 }
 
 .toast-info {
-  background-color: #1976d2;
+  background: linear-gradient(135deg, var(--info) 0%, #2563eb 100%);
+  border-left: 4px solid #3b82f6;
 }
 
 .toast-warning {
-  background-color: #f57c00;
+  background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+  border-left: 4px solid #f59e0b;
 }
 
+.toast::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-success::before {
+  content: '✓';
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.toast-error::before {
+  content: '✕';
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.toast-info::before {
+  content: 'ℹ';
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.toast-warning::before {
+  content: '⚠';
+  font-size: 14px;
+  font-weight: bold;
+}

@@ -1,145 +1,213 @@
 .analytics-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: var(--spacing-3xl) var(--spacing-xl);
 }
 
 .analytics-header {
-  margin-bottom: 40px;
+  margin-bottom: var(--spacing-3xl);
 }
 
 .analytics-header h1 {
-  font-size: 32px;
-  margin-bottom: 8px;
-  color: #1a1a1a;
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
+  letter-spacing: -1px;
+  line-height: var(--line-height-tight);
 }
 
 .analytics-header p {
-  color: #666;
-  font-size: 16px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-relaxed);
 }
 
 .analytics-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 24px;
-  margin-bottom: 40px;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-3xl);
 }
 
 .summary-section {
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-base);
+}
+
+.summary-section:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  border-color: var(--border);
 }
 
 .summary-section h2 {
-  font-size: 20px;
-  margin-bottom: 20px;
-  color: #1a1a1a;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-primary);
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: var(--spacing-md);
 }
 
 .stat-card {
   text-align: center;
-  padding: 16px;
-  background-color: #f5f5f5;
-  border-radius: 6px;
+  padding: var(--spacing-lg);
+  background: var(--background-alt);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-base);
+}
+
+.stat-card:hover {
+  background: rgba(255, 107, 53, 0.05);
+  border-color: var(--border);
+  transform: scale(1.02);
 }
 
 .stat-label {
-  font-size: 12px;
-  color: #666;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
+  letter-spacing: 1px;
+  margin-bottom: var(--spacing-sm);
+  font-weight: var(--font-weight-medium);
 }
 
 .stat-value {
-  font-size: 24px;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  line-height: var(--line-height-tight);
 }
 
 .top-posts-section {
-  background: white;
-  border-radius: 8px;
-  padding: 32px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--background);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-light);
 }
 
 .top-posts-section h2 {
-  font-size: 24px;
-  margin-bottom: 24px;
-  color: #1a1a1a;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
 }
 
 .top-posts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-xl);
 }
 
 .top-post-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
   position: relative;
+  background: var(--background);
+  transition: all var(--transition-base);
+}
+
+.top-post-card:hover {
+  border-color: var(--border-dark);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
 }
 
 .post-rank {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background-color: #d32f2f;
-  color: white;
-  width: 32px;
-  height: 32px;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: var(--primary-gradient);
+  color: var(--text-inverse);
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-base);
+  box-shadow: var(--shadow-md);
 }
 
 .post-metrics {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--spacing-md);
 }
 
 .metric {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.metric:last-child {
+  border-bottom: none;
 }
 
 .metric-label {
-  font-size: 14px;
-  color: #666;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
 }
 
 .metric-value {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
 }
 
 .post-date {
-  margin-top: 12px;
-  font-size: 12px;
-  color: #999;
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  text-align: right;
 }
 
 .empty-state {
   text-align: center;
-  padding: 40px;
-  color: #666;
+  padding: var(--spacing-4xl);
+  color: var(--text-secondary);
+  background: var(--background);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-light);
 }
 
+.empty-state-icon {
+  font-size: 64px;
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.3;
+  color: var(--text-tertiary);
+}
+
+.empty-state-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.empty-state-description {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: var(--line-height-relaxed);
+}
