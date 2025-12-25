@@ -6,36 +6,58 @@
 
 .billing-header {
   margin-bottom: var(--spacing-3xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.billing-header-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 107, 53, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFD700;
+  font-size: 32px;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
 }
 
 .billing-header h1 {
   font-size: var(--font-size-5xl);
   font-weight: var(--font-weight-bold);
   margin-bottom: var(--spacing-sm);
-  color: var(--text-primary);
+  color: var(--text-inverse);
   letter-spacing: -1px;
   line-height: var(--line-height-tight);
+  flex: 1;
 }
 
 .billing-header p {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.8);
   font-size: var(--font-size-lg);
   line-height: var(--line-height-relaxed);
+  width: 100%;
 }
 
 .billing-content {
-  background: var(--background);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
   padding: var(--spacing-2xl);
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border-light);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .subscription-card h2 {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   margin-bottom: var(--spacing-xl);
-  color: var(--text-primary);
+  color: var(--text-inverse);
   letter-spacing: -0.5px;
 }
 
@@ -50,8 +72,9 @@
 .plan-name {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
+  color: #FFD700;
   letter-spacing: -0.5px;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 
 .plan-status {
@@ -78,11 +101,11 @@
 .plan-details {
   margin-bottom: var(--spacing-xl);
   padding-bottom: var(--spacing-xl);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .plan-details p {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.8);
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
 }
@@ -95,7 +118,7 @@
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   margin-bottom: var(--spacing-md);
-  color: var(--text-primary);
+  color: var(--text-inverse);
 }
 
 .plan-limits ul {
@@ -105,7 +128,7 @@
 
 .plan-limits li {
   padding: var(--spacing-sm) 0;
-  color: var(--text-primary);
+  color: rgba(255, 255, 255, 0.9);
   font-size: var(--font-size-base);
   display: flex;
   align-items: center;
@@ -135,13 +158,13 @@
 .no-subscription h2 {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
+  color: var(--text-inverse);
   margin-bottom: var(--spacing-md);
   letter-spacing: -0.5px;
 }
 
 .no-subscription p {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.8);
   font-size: var(--font-size-base);
   margin-bottom: var(--spacing-xl);
   line-height: var(--line-height-relaxed);

@@ -14,9 +14,17 @@ import {
 } from 'react-icons/fi';
 import '../styles/Sidebar.css';
 
-const Sidebar = () => {
+const Sidebar = ({ onCollapseChange }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
+
+  const handleToggle = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    if (onCollapseChange) {
+      onCollapseChange(newState);
+    }
+  };
 
   const menuItems = [
     { path: '/dashboard', icon: FiLayout, label: 'Dashboard' },
@@ -38,12 +46,12 @@ const Sidebar = () => {
         {!isCollapsed && (
           <Link to="/dashboard" className="sidebar-logo">
             <FiZap className="sidebar-logo-icon" />
-            <span>Flacron</span>
+            <span>Flacron Social Auto</span>
           </Link>
         )}
         <button 
           className="sidebar-toggle"
-          onClick={() => setIsCollapsed(!isCollapsed)}
+          onClick={handleToggle}
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? <FiChevronRight /> : <FiChevronLeft />}

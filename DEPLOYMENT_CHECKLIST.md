@@ -124,3 +124,4 @@ In Vercel Dashboard → Project Settings → Environment Variables:
 
 Your application is now structured for Vercel deployment. Follow the steps above to deploy.
 
+

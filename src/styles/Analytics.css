@@ -8,19 +8,43 @@
   margin-bottom: var(--spacing-3xl);
 }
 
+.analytics-header {
+  margin-bottom: var(--spacing-3xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.analytics-header-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 107, 53, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFD700;
+  font-size: 32px;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
 .analytics-header h1 {
   font-size: var(--font-size-5xl);
   font-weight: var(--font-weight-bold);
   margin-bottom: var(--spacing-sm);
-  color: var(--text-primary);
+  color: var(--text-inverse);
   letter-spacing: -1px;
   line-height: var(--line-height-tight);
+  flex: 1;
 }
 
 .analytics-header p {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.8);
   font-size: var(--font-size-lg);
   line-height: var(--line-height-relaxed);
+  width: 100%;
 }
 
 .analytics-summary {
@@ -31,25 +55,28 @@
 }
 
 .summary-section {
-  background: var(--background);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border-light);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   transition: all var(--transition-base);
 }
 
 .summary-section:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-  border-color: var(--border);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .summary-section h2 {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   margin-bottom: var(--spacing-lg);
-  color: var(--text-primary);
+  color: var(--text-inverse);
 }
 
 .stats-grid {
@@ -61,21 +88,22 @@
 .stat-card {
   text-align: center;
   padding: var(--spacing-lg);
-  background: var(--background-alt);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   border-radius: var(--radius);
-  border: 1px solid var(--border-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all var(--transition-base);
 }
 
 .stat-card:hover {
-  background: rgba(255, 107, 53, 0.05);
-  border-color: var(--border);
+  background: rgba(255, 107, 53, 0.1);
+  border-color: rgba(255, 107, 53, 0.3);
   transform: scale(1.02);
 }
 
 .stat-label {
   font-size: var(--font-size-xs);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: var(--spacing-sm);
@@ -85,23 +113,26 @@
 .stat-value {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
+  color: #FFD700;
   line-height: var(--line-height-tight);
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 
 .top-posts-section {
-  background: var(--background);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: var(--radius-lg);
   padding: var(--spacing-2xl);
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border-light);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .top-posts-section h2 {
   font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-bold);
   margin-bottom: var(--spacing-xl);
-  color: var(--text-primary);
+  color: var(--text-inverse);
   letter-spacing: -0.5px;
 }
 
@@ -112,18 +143,20 @@
 }
 
 .top-post-card {
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   position: relative;
-  background: var(--background);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   transition: all var(--transition-base);
 }
 
 .top-post-card:hover {
-  border-color: var(--border-dark);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transform: translateY(-4px);
 }
 
 .post-rank {
@@ -154,7 +187,7 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-sm) 0;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .metric:last-child {
@@ -163,50 +196,51 @@
 
 .metric-label {
   font-size: var(--font-size-sm);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   font-weight: var(--font-weight-medium);
 }
 
 .metric-value {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
+  color: var(--text-inverse);
 }
 
 .post-date {
   margin-top: var(--spacing-md);
   font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
+  color: rgba(255, 255, 255, 0.5);
   text-align: right;
 }
 
 .empty-state {
   text-align: center;
   padding: var(--spacing-4xl);
-  color: var(--text-secondary);
-  background: var(--background);
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border-light);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .empty-state-icon {
   font-size: 64px;
   margin-bottom: var(--spacing-lg);
   opacity: 0.3;
-  color: var(--text-tertiary);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .empty-state-title {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
+  color: var(--text-inverse);
   margin-bottom: var(--spacing-md);
 }
 
 .empty-state-description {
   font-size: var(--font-size-base);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   max-width: 500px;
   margin: 0 auto;
   line-height: var(--line-height-relaxed);

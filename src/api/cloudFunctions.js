@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/<project>/us-central1';
+// For deployed functions, use: https://us-central1-flacronsocialauto.cloudfunctions.net
+// For local emulator, use: http://localhost:5001/flacronsocialauto/us-central1
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://us-central1-flacronsocialauto.cloudfunctions.net';
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -78,13 +80,14 @@ export const stripeAPI = {
 
 // AI endpoints
 export const aiAPI = {
-  generatePosts: async (userId, niche, goal, tone, count) => {
+  generatePosts: async (userId, niche, goal, tone, count, platform = 'All') => {
     const response = await apiClient.post('/generatePosts', {
       userId,
       niche,
       goal,
       tone,
       count,
+      platform,
     });
     return response.data;
   },

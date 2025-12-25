@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { FiFileText } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { collection, onSnapshot, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../utils/firebase';
@@ -86,8 +87,13 @@ const Templates = () => {
   return (
     <div className="templates-container">
       <div className="templates-header">
-        <h1>Post Templates</h1>
-        <p>Manage your saved post templates</p>
+        <div className="templates-header-icon">
+          <FiFileText />
+        </div>
+        <div>
+          <h1>Post Templates</h1>
+          <p>Manage your saved post templates</p>
+        </div>
       </div>
 
       {templates.length === 0 ? (

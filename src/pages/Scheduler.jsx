@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
+import { FiCalendar, FiUpload, FiX } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy, getDocs } from 'firebase/firestore';
-import { db } from '../utils/firebase';
+import { db, storage } from '../utils/firebase';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { useApp } from '../context/AppContext';
 import { useLocation } from 'react-router-dom';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay } from 'date-fns';
+import Dropdown from '../components/Dropdown';
 import '../styles/Scheduler.css';
 
 const Scheduler = () => {
@@ -23,6 +26,9 @@ const Scheduler = () => {
   const [formPlatform, setFormPlatform] = useState('');
   const [formCaption, setFormCaption] = useState('');
   const [formMediaUrl, setFormMediaUrl] = useState('');
+  const [formMediaFile, setFormMediaFile] = useState(null);
+  const [formMediaPreview, setFormMediaPreview] = useState(null);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
   const [formDate, setFormDate] = useState('');
   const [formTime, setFormTime] = useState('');
 
@@ -67,6 +73,39 @@ const Scheduler = () => {
     }
   }, [location.state]);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/quicktime'];
+    if (!validTypes.includes(file.type)) {
+      showToast('Please upload an image (JPEG, PNG, GIF, WebP) or video (MP4, MOV)', 'error');
+      return;
+    }
+
+    // Validate file size (max 100MB)
+    if (file.size > 100 * 1024 * 1024) {
+      showToast('File size must be less than 100MB', 'error');
+      return;
+    }
+
+    setFormMediaFile(file);
+    setFormMediaUrl(''); // Clear URL if file is selected
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormMediaPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveFile = () => {
+    setFormMediaFile(null);
+    setFormMediaPreview(null);
+  };
+
   const handlePreview = () => {
     if (!formPlatform || !formCaption || !formDate || !formTime) {
       showToast('Please fill in all required fields before preview', 'error');
@@ -83,11 +122,25 @@ const Scheduler = () => {
     }
 
     try {
+      setUploadingMedia(true);
+      let finalMediaUrl = formMediaUrl || null;
+
+      // Upload file to Firebase Storage if file is selected
+      if (formMediaFile) {
+        const fileExtension = formMediaFile.name.split('.').pop();
+        const fileName = `posts/${user.uid}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
+        const storageRef = ref(storage, fileName);
+        
+        await uploadBytes(storageRef, formMediaFile);
+        finalMediaUrl = await getDownloadURL(storageRef);
+      }
+
       const scheduledDateTime = new Date(`${formDate}T${formTime}`);
       const postData = {
         platform: formPlatform,
         captionText: formCaption,
-        mediaUrl: formMediaUrl || null,
+        mediaUrl: finalMediaUrl,
+        mediaType: formMediaFile ? formMediaFile.type : (formMediaUrl ? 'url' : null),
         scheduledAt: scheduledDateTime.toISOString(),
         status: 'pending',
         createdAt: new Date().toISOString(),
@@ -111,11 +164,15 @@ const Scheduler = () => {
       setEditingPost(null);
       setFormCaption('');
       setFormMediaUrl('');
+      setFormMediaFile(null);
+      setFormMediaPreview(null);
       setFormDate('');
       setFormTime('');
     } catch (error) {
       console.error('Error saving scheduled post:', error);
       showToast('Failed to save post. Please try again.', 'error');
+    } finally {
+      setUploadingMedia(false);
     }
   };
 
@@ -124,6 +181,8 @@ const Scheduler = () => {
     setFormPlatform(post.platform);
     setFormCaption(post.captionText);
     setFormMediaUrl(post.mediaUrl || '');
+    setFormMediaFile(null);
+    setFormMediaPreview(post.mediaUrl || null);
     const scheduledDate = new Date(post.scheduledAt);
     setFormDate(format(scheduledDate, 'yyyy-MM-dd'));
     setFormTime(format(scheduledDate, 'HH:mm'));
@@ -164,7 +223,13 @@ const Scheduler = () => {
   return (
     <div className="scheduler-container">
       <div className="scheduler-header">
-        <h1>Scheduler</h1>
+        <div className="scheduler-header-icon">
+          <FiCalendar />
+        </div>
+        <div style={{ flex: 1 }}>
+          <h1>Post Scheduler</h1>
+          <p>Schedule and manage your social media posts</p>
+        </div>
         <div className="scheduler-controls">
           <button
             className={`btn ${viewMode === 'week' ? 'btn-primary' : 'btn-secondary'}`}
@@ -294,20 +359,26 @@ const Scheduler = () => {
             <h2>{editingPost ? 'Edit Scheduled Post' : 'Schedule New Post'}</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label htmlFor="platform">Platform</label>
-                <select
-                  id="platform"
+                <Dropdown
+                  label="Platform"
                   value={formPlatform}
-                  onChange={(e) => setFormPlatform(e.target.value)}
+                  onChange={setFormPlatform}
+                  options={connectedAccounts.length > 0 
+                    ? connectedAccounts.map(acc => ({
+                        value: acc.platform,
+                        label: acc.platform.charAt(0).toUpperCase() + acc.platform.slice(1)
+                      }))
+                    : []
+                  }
+                  placeholder="Select platform"
                   required
-                >
-                  <option value="">Select platform</option>
-                  {connectedAccounts.map((account) => (
-                    <option key={account.id} value={account.platform}>
-                      {account.platform}
-                    </option>
-                  ))}
-                </select>
+                  disabled={connectedAccounts.length === 0}
+                />
+                {connectedAccounts.length === 0 && (
+                  <p className="form-hint" style={{ marginTop: '8px', fontSize: '13px', color: 'var(--text-tertiary)' }}>
+                    No connected accounts. <a href="/accounts" style={{ color: 'var(--primary)' }}>Connect an account</a> first.
+                  </p>
+                )}
               </div>
 
               <div className="form-group">
@@ -319,18 +390,64 @@ const Scheduler = () => {
                   placeholder="Enter post caption"
                   rows="4"
                   required
+                  className="input"
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="mediaUrl">Media URL (optional)</label>
-                <input
-                  type="url"
-                  id="mediaUrl"
-                  value={formMediaUrl}
-                  onChange={(e) => setFormMediaUrl(e.target.value)}
-                  placeholder="https://..."
-                />
+                <label htmlFor="media">Media (optional)</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                  <input
+                    type="file"
+                    id="media"
+                    accept="image/*,video/mp4,video/quicktime"
+                    onChange={handleFileChange}
+                    className="input"
+                    style={{ padding: '8px' }}
+                    disabled={uploadingMedia}
+                  />
+                  {formMediaPreview && (
+                    <div style={{ position: 'relative', marginTop: 'var(--spacing-sm)' }}>
+                      {formMediaPreview.startsWith('data:video') || formMediaPreview.includes('.mp4') || formMediaPreview.includes('.mov') ? (
+                        <video src={formMediaPreview} controls style={{ width: '100%', maxHeight: '300px', borderRadius: 'var(--radius)', objectFit: 'contain' }} />
+                      ) : (
+                        <img src={formMediaPreview} alt="Preview" style={{ width: '100%', maxHeight: '300px', borderRadius: 'var(--radius)', objectFit: 'contain' }} />
+                      )}
+                      <button
+                        type="button"
+                        onClick={handleRemoveFile}
+                        style={{
+                          position: 'absolute',
+                          top: '8px',
+                          right: '8px',
+                          background: 'rgba(0, 0, 0, 0.7)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '32px',
+                          height: '32px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <FiX />
+                      </button>
+                    </div>
+                  )}
+                  {!formMediaFile && (
+                    <input
+                      type="url"
+                      value={formMediaUrl}
+                      onChange={(e) => setFormMediaUrl(e.target.value)}
+                      placeholder="Or enter media URL (https://...)"
+                      className="input"
+                      style={{ marginTop: formMediaPreview ? 'var(--spacing-sm)' : '0' }}
+                    />
+                  )}
+                </div>
+                <p className="form-hint">Upload an image or video, or paste a URL. Max file size: 100MB</p>
               </div>
 
               <div className="form-row">
@@ -342,6 +459,7 @@ const Scheduler = () => {
                     value={formDate}
                     onChange={(e) => setFormDate(e.target.value)}
                     required
+                    className="input"
                   />
                 </div>
 
@@ -353,6 +471,7 @@ const Scheduler = () => {
                     value={formTime}
                     onChange={(e) => setFormTime(e.target.value)}
                     required
+                    className="input"
                   />
                 </div>
               </div>
@@ -365,8 +484,8 @@ const Scheduler = () => {
                 >
                   Preview
                 </button>
-                <button type="submit" className="btn btn-primary">
-                  {editingPost ? 'Update' : 'Schedule'}
+                <button type="submit" className="btn btn-primary" disabled={uploadingMedia}>
+                  {uploadingMedia ? 'Uploading...' : (editingPost ? 'Update' : 'Schedule')}
                 </button>
                 <button
                   type="button"
@@ -398,11 +517,15 @@ const Scheduler = () => {
                     : 'Date not set'}
                 </span>
               </div>
-              {formMediaUrl && (
+              {(formMediaPreview || formMediaUrl) && (
                 <div className="preview-media">
-                  <img src={formMediaUrl} alt="Post preview" onError={(e) => {
-                    e.target.style.display = 'none';
-                  }} />
+                  {(formMediaPreview || formMediaUrl)?.startsWith('data:video') || (formMediaPreview || formMediaUrl)?.includes('.mp4') || (formMediaPreview || formMediaUrl)?.includes('.mov') ? (
+                    <video src={formMediaPreview || formMediaUrl} controls style={{ width: '100%', borderRadius: 'var(--radius)' }} />
+                  ) : (
+                    <img src={formMediaPreview || formMediaUrl} alt="Post preview" onError={(e) => {
+                      e.target.style.display = 'none';
+                    }} />
+                  )}
                 </div>
               )}
               <div className="preview-caption">

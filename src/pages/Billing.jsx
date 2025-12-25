@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { FiCreditCard } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../utils/firebase';
@@ -53,8 +54,13 @@ const Billing = () => {
   return (
     <div className="billing-container">
       <div className="billing-header">
-        <h1>Billing & Subscription</h1>
-        <p>Manage your subscription and billing</p>
+        <div className="billing-header-icon">
+          <FiCreditCard />
+        </div>
+        <div>
+          <h1>Billing & Subscription</h1>
+          <p>Manage your subscription and billing</p>
+        </div>
       </div>
 
       <div className="billing-content">

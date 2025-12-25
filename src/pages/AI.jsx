@@ -6,6 +6,7 @@ import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 import { useApp } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import Dropdown from '../components/Dropdown';
 import '../styles/AI.css';
 
 const tones = [
@@ -17,14 +18,59 @@ const tones = [
   'Educational',
 ];
 
+const nicheOptions = [
+  'Fitness',
+  'Technology',
+  'Fashion',
+  'Food & Beverage',
+  'Travel',
+  'Health & Wellness',
+  'Beauty',
+  'Education',
+  'Business',
+  'Entertainment',
+  'Sports',
+  'Real Estate',
+  'Finance',
+  'E-commerce',
+  'Custom',
+];
+
+const goalOptions = [
+  'Increase engagement',
+  'Promote product',
+  'Build brand awareness',
+  'Drive website traffic',
+  'Generate leads',
+  'Share educational content',
+  'Announce new feature',
+  'Run promotion',
+  'Build community',
+  'Showcase testimonials',
+  'Custom',
+];
+
+const platformOptions = [
+  'All',
+  'Instagram',
+  'Facebook',
+  'Twitter',
+  'LinkedIn',
+];
+
 const AI = () => {
   const { user } = useAuth();
   const { showToast } = useApp();
   const navigate = useNavigate();
+  const [platform, setPlatform] = useState('All');
   const [niche, setNiche] = useState('');
+  const [nicheIsCustom, setNicheIsCustom] = useState(false);
+  const [customNiche, setCustomNiche] = useState('');
   const [goal, setGoal] = useState('');
+  const [goalIsCustom, setGoalIsCustom] = useState(false);
+  const [customGoal, setCustomGoal] = useState('');
   const [tone, setTone] = useState('Professional');
-  const [count, setCount] = useState(7);
+  const [count, setCount] = useState(1);
   const [generatedPosts, setGeneratedPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
@@ -32,9 +78,37 @@ const AI = () => {
   const [editCaption, setEditCaption] = useState('');
   const [editHashtags, setEditHashtags] = useState('');
 
+  const handleNicheChange = (value) => {
+    if (value === 'Custom') {
+      setNicheIsCustom(true);
+      setNiche('');
+      setCustomNiche('');
+    } else {
+      setNicheIsCustom(false);
+      setNiche(value);
+      setCustomNiche('');
+    }
+  };
+
+  const handleGoalChange = (value) => {
+    if (value === 'Custom') {
+      setGoalIsCustom(true);
+      setGoal('');
+      setCustomGoal('');
+    } else {
+      setGoalIsCustom(false);
+      setGoal(value);
+      setCustomGoal('');
+    }
+  };
+
   const handleGenerate = async (e) => {
     e.preventDefault();
-    if (!niche || !goal) {
+    
+    const finalNiche = nicheIsCustom ? customNiche : niche;
+    const finalGoal = goalIsCustom ? customGoal : goal;
+    
+    if (!finalNiche || !finalGoal) {
       showToast('Please fill in niche and goal', 'error');
       return;
     }
@@ -46,7 +120,7 @@ const AI = () => {
 
     setLoading(true);
     try {
-      const response = await aiAPI.generatePosts(user.uid, niche, goal, tone, count);
+      const response = await aiAPI.generatePosts(user.uid, finalNiche, finalGoal, tone, count, platform);
       if (Array.isArray(response)) {
         setGeneratedPosts(response);
         showToast(`Generated ${response.length} posts!`, 'success');
@@ -55,10 +129,23 @@ const AI = () => {
       }
     } catch (error) {
       console.error('Error generating posts:', error);
-      showToast(
-        'Failed to generate posts. Please check your plan limits or try again.',
-        'error'
-      );
+      
+      // Extract actual error message from API response
+      let errorMessage = 'Failed to generate posts. Please try again.';
+      
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.status === 403) {
+        errorMessage = error.response.data?.error || 'Access denied. Please check your subscription or plan limits.';
+      } else if (error.response?.status === 503) {
+        errorMessage = error.response.data?.error || 'AI service is temporarily unavailable. Please try again later.';
+      } else if (error.response?.status === 400) {
+        errorMessage = error.response.data?.error || 'Invalid request. Please check your inputs.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      showToast(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
@@ -132,25 +219,107 @@ const AI = () => {
         <form onSubmit={handleGenerate} className="ai-form">
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="niche">Niche / Industry</label>
-              <input
-                type="text"
-                id="niche"
-                value={niche}
-                onChange={(e) => setNiche(e.target.value)}
-                placeholder="e.g., Fitness, Tech, Fashion"
+              <Dropdown
+                label="Platform"
+                value={platform}
+                onChange={setPlatform}
+                options={platformOptions}
+                placeholder="Select platform"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="goal">Content Goal</label>
-              <input
-                type="text"
-                id="goal"
-                value={goal}
-                onChange={(e) => setGoal(e.target.value)}
-                placeholder="e.g., Increase engagement, Promote product"
+              {!nicheIsCustom ? (
+                <Dropdown
+                  label="Niche / Industry"
+                  value={niche}
+                  onChange={handleNicheChange}
+                  options={nicheOptions}
+                  placeholder="Select niche or choose custom"
+                  required
+                />
+              ) : (
+                <div>
+                  <label htmlFor="customNiche">Niche / Industry (Custom)</label>
+                  <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-end' }}>
+                    <input
+                      type="text"
+                      id="customNiche"
+                      value={customNiche}
+                      onChange={(e) => setCustomNiche(e.target.value)}
+                      placeholder="Enter your custom niche"
+                      required
+                      className="input"
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => {
+                        setNicheIsCustom(false);
+                        setCustomNiche('');
+                        setNiche('');
+                      }}
+                      style={{ padding: '6px 12px', fontSize: '12px' }}
+                    >
+                      Back
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              {!goalIsCustom ? (
+                <Dropdown
+                  label="Content Goal"
+                  value={goal}
+                  onChange={handleGoalChange}
+                  options={goalOptions}
+                  placeholder="Select goal or choose custom"
+                  required
+                />
+              ) : (
+                <div>
+                  <label htmlFor="customGoal">Content Goal (Custom)</label>
+                  <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-end' }}>
+                    <input
+                      type="text"
+                      id="customGoal"
+                      value={customGoal}
+                      onChange={(e) => setCustomGoal(e.target.value)}
+                      placeholder="Enter your custom goal"
+                      required
+                      className="input"
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => {
+                        setGoalIsCustom(false);
+                        setCustomGoal('');
+                        setGoal('');
+                      }}
+                      style={{ padding: '6px 12px', fontSize: '12px' }}
+                    >
+                      Back
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="form-group">
+              <Dropdown
+                label="Tone"
+                value={tone}
+                onChange={setTone}
+                options={tones}
+                placeholder="Select tone"
                 required
               />
             </div>
@@ -158,32 +327,19 @@ const AI = () => {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="tone">Tone</label>
-              <select
-                id="tone"
-                value={tone}
-                onChange={(e) => setTone(e.target.value)}
-              >
-                {tones.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
               <label htmlFor="count">Number of Posts</label>
               <input
                 type="number"
                 id="count"
                 value={count}
-                onChange={(e) => setCount(parseInt(e.target.value))}
-                min="7"
-                max="30"
+                onChange={(e) => setCount(parseInt(e.target.value) || 1)}
+                min="1"
+                max="10"
                 required
+                className="input"
               />
             </div>
+            <div className="form-group"></div>
           </div>
 
           <button type="submit" className="btn btn-primary" disabled={loading}>

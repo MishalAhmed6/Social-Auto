@@ -2,12 +2,13 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   sendPasswordResetEmail as firebaseSendPasswordResetEmail,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../utils/firebase';
+import { auth, db, googleProvider } from '../utils/firebase';
 
 const AuthContext = createContext(null);
 
@@ -130,6 +131,40 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      const userId = user.uid;
+      
+      // Check if user document exists, if not create it
+      const userDocRef = doc(db, 'users', userId);
+      const userDocSnap = await getDoc(userDocRef);
+      
+      if (!userDocSnap.exists()) {
+        // Create user document for new Google sign-in users
+        await setDoc(userDocRef, {
+          name: user.displayName || user.email?.split('@')[0] || 'User',
+          email: user.email,
+          role: 'user',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+      }
+      
+      const token = await user.getIdToken();
+      setIdToken(token);
+      localStorage.setItem('idToken', token);
+      
+      await loadUserProfile(userId);
+      
+      return { success: true, user };
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     idToken,
@@ -137,6 +172,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
     sendPasswordResetEmail,
     loadUserProfile,

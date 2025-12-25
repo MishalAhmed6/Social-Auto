@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { FiUsers, FiCreditCard, FiCalendar, FiZap, FiFileText, FiArrowRight } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
-import { collection, query, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 import { stripeAPI } from '../api/cloudFunctions';
 import { useApp } from '../context/AppContext';
@@ -17,38 +17,60 @@ const Dashboard = () => {
   const [nextScheduledPost, setNextScheduledPost] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const hasSyncedRef = useRef(false);
+  const unsubscribeRef = useRef(null);
 
+  // Load subscription data
+  const loadSubscription = async () => {
+    if (!user) return;
+    try {
+      const subDocRef = doc(db, 'subscriptions', user.uid);
+      const subDocSnap = await getDoc(subDocRef);
+      if (subDocSnap.exists()) {
+        const data = subDocSnap.data();
+        console.log('Subscription data loaded:', data);
+        setSubscription(data);
+      } else {
+        console.log('No subscription document found');
+        setSubscription(null);
+      }
+    } catch (error) {
+      console.error('Error loading subscription:', error);
+      setSubscription(null);
+    }
+  };
+
+  // Handle checkout sync
   useEffect(() => {
     if (!user) return;
 
-    // Check if redirected from successful checkout (only sync once)
     const checkoutSuccess = searchParams.get('checkout');
     if (checkoutSuccess === 'success' && !hasSyncedRef.current) {
       hasSyncedRef.current = true;
-      
-      // Remove checkout param from URL to prevent re-syncing on refresh
       navigate('/dashboard', { replace: true });
       
-      // Sync subscription after checkout
       stripeAPI.syncSubscription(user.uid)
         .then((response) => {
           console.log('Sync response:', response);
           showToast('Subscription synced successfully!', 'success');
-          // Reload subscription after a short delay
+          // Reload subscription after sync
           setTimeout(() => {
             loadSubscription();
-          }, 1000);
+          }, 1500);
         })
         .catch((error) => {
           console.error('Error syncing subscription:', error);
-          console.error('Error details:', error.response?.data || error.message);
-          // Try to reload anyway in case it was written
+          showToast(error.response?.data?.error || 'Syncing subscription...', 'info');
+          // Try to reload anyway
           setTimeout(() => {
             loadSubscription();
-          }, 1000);
-          showToast(error.response?.data?.error || 'Syncing subscription... Please refresh if it doesn\'t appear.', 'info');
+          }, 1500);
         });
     }
+  }, [user, searchParams, navigate, showToast]);
+
+  // Main data loading effect
+  useEffect(() => {
+    if (!user) return;
 
     // Load connected accounts count
     const loadAccounts = async () => {
@@ -76,30 +98,46 @@ const Dashboard = () => {
       }
     };
 
+    // Set up subscription listener with proper cleanup
+    let unsubscribe = null;
+    try {
+      const subDocRef = doc(db, 'subscriptions', user.uid);
+      unsubscribe = onSnapshot(
+        subDocRef,
+        (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            console.log('Subscription updated:', data);
+            setSubscription(data);
+          } else {
+            setSubscription(null);
+          }
+        },
+        (error) => {
+          console.error('Subscription listener error:', error);
+          // Fallback to manual load on error
+          loadSubscription();
+        }
+      );
+      unsubscribeRef.current = unsubscribe;
+    } catch (error) {
+      console.error('Error setting up subscription listener:', error);
+      // Fallback to manual load
+      loadSubscription();
+    }
 
     loadAccounts();
     loadNextPost();
     loadSubscription();
-  }, [user]);
 
-  const loadSubscription = async () => {
-    try {
-      const subDocRef = doc(db, 'subscriptions', user.uid);
-      const subDocSnap = await getDoc(subDocRef);
-      console.log('Subscription doc exists:', subDocSnap.exists());
-      if (subDocSnap.exists()) {
-        const data = subDocSnap.data();
-        console.log('Subscription data:', data);
-        setSubscription(data);
-      } else {
-        console.log('No subscription document found for user:', user.uid);
-        setSubscription(null);
+    // Cleanup
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
       }
-    } catch (error) {
-      console.error('Error loading subscription:', error);
-      console.error('Error details:', error.message);
-    }
-  };
+    };
+  }, [user]);
 
   return (
     <div className="dashboard-container">

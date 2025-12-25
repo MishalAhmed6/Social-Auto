@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FiInstagram, FiFacebook, FiTwitter, FiLinkedin, FiTrash2, FiCheck } from 'react-icons/fi';
+import { FiInstagram, FiFacebook, FiTwitter, FiLinkedin, FiTrash2, FiCheck, FiUsers } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../utils/firebase';
@@ -123,8 +123,13 @@ const Accounts = () => {
   return (
     <div className="accounts-container">
       <div className="accounts-header">
-        <h1>Connected Accounts</h1>
-        <p>Manage your social media accounts</p>
+        <div className="accounts-header-icon">
+          <FiUsers />
+        </div>
+        <div>
+          <h1>Connected Accounts</h1>
+          <p>Manage your social media accounts</p>
+        </div>
       </div>
 
       <div className="accounts-section">

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 import { useApp } from '../context/AppContext';
+import Dropdown from '../components/Dropdown';
 import '../styles/Onboarding.css';
 
 const businessCategories = [
@@ -95,41 +96,30 @@ const OnboardingProfile = () => {
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your full name"
               required
+              className="input"
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="businessCategory">Business Category</label>
-            <select
-              id="businessCategory"
+            <Dropdown
+              label="Business Category"
               value={businessCategory}
-              onChange={(e) => setBusinessCategory(e.target.value)}
+              onChange={setBusinessCategory}
+              options={businessCategories}
+              placeholder="Select a category"
               required
-            >
-              <option value="">Select a category</option>
-              {businessCategories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
           <div className="form-group">
-            <label htmlFor="timezone">Timezone</label>
-            <select
-              id="timezone"
+            <Dropdown
+              label="Timezone"
               value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
+              onChange={setTimezone}
+              options={timezones}
+              placeholder="Select your timezone"
               required
-            >
-              <option value="">Select your timezone</option>
-              {timezones.map((tz) => (
-                <option key={tz.value} value={tz.value}>
-                  {tz.label}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
           <button type="submit" className="btn btn-primary" disabled={loading}>

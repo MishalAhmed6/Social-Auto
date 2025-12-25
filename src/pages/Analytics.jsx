@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { FiBarChart2 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../utils/firebase';
@@ -79,8 +80,13 @@ const Analytics = () => {
   return (
     <div className="analytics-container">
       <div className="analytics-header">
-        <h1>Analytics</h1>
-        <p>Track your post performance</p>
+        <div className="analytics-header-icon">
+          <FiBarChart2 />
+        </div>
+        <div>
+          <h1>Analytics</h1>
+          <p>Track your post performance</p>
+        </div>
       </div>
 
       <div className="analytics-summary">
